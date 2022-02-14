@@ -1,0 +1,49 @@
+(define x 5); x=5
+; (define név kifejezés)
+; (define fgnév lambda-kifejezés)
+(define id (lambda (x) x))
+(define inc (lambda (x) (+ x 1)))
+; lambda szintaxisa: (lambda (param) kiszámítási szabály)
+(define dec (lambda (x) (- x 1)))
+(define negyzet (lambda (x) (* x x)))
+(define osszead (lambda (x y) (+ x y)))
+(define kivonas (lambda (x y) (- x y)))
+(define osszead2 (lambda (x) (lambda (y) (+ x y))))
+(define (f x y) (+ x y))
+
+; define első használata : (define név kifejezés)
+; define második használata: (define (fnév paramlist) kiszámítási-szabály)
+(define (id2 x) x)
+(define (inc2 x) (+ x 1))
+(writeln (id2 5))
+
+(writeln (string-append "hello" " " "világ"))
+(writeln (number->string 5))
+(writeln (string-append "id2 5 hivás eredménye: " (number->string (id2 5))))
+(writeln (f 5 3))
+(writeln (id 5))
+(writeln (dec 5))
+(writeln (negyzet 5))
+(writeln ((osszead2 5) 3))
+(writeln (inc2 5))
+
+
+; megegyezés szerint 0! = 1
+; faktoriális számítás: 5! = 1*2*3*4*5
+; (fact 5) = 5 * (fact 4)
+; if, cond
+; (cond [(ág-1 feltétele) (ág-1 értéke)] [(ág-2 feltétele) (ág-2 értéke)]...[else (else-ág értéke)])
+(define (fact x)
+    (cond
+        [(= x 0) 1] 
+        [else (* x (fact (- x 1)))]))
+(writeln (fact 3))
+
+; a rekurzió ugyanolyan erősségű programozói eszköz mint a ciklus
+; tehát amit meg lehet csinálni ciklusal azt meg lehet csinálni rekurzióval és forditva
+(define (ki10 i)
+    (cond
+        [(> i 10) (writeln i) (ki10 (+ i 1))]))
+(writeln (ki10 5))
+
+;joel on softwaren irj véleményt, foglald össze amit joel irt 3órányi munka
