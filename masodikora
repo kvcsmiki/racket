@@ -1,0 +1,127 @@
+(define lista1 (cons 1 (cons 2 (cons 3 null))))
+(define lista2 (list 1 2 3))
+(define lista3 '(1 2 3))
+
+
+(writeln (list? lista1)) ; 1 2 3
+(writeln (empty? lista2))
+(writeln (null? lista3)) ; #t- true #f -false
+
+;a lista rekurzív adatszerkezet ezért rekurzívan dolgozom fel
+; a lista rekurzív adatszerkezet, mert fejből és farokból áll, és a farok mindig lista
+; a kutya az egy kutya - rossz definíció
+; a lista farka lista - ez jó mert a definíció nem minden ága rekurzív
+; (rest '(1 2 3)) = '(2 3), (first '(1 2 3)) = 1
+; (rest '(3)) = '(), (first '(1 2 3)) = 1
+; az üres listának se feje se farka
+; hogy dolgozom fel rekurzívan? meghívom önmagam rekurzívan a farokra
+; a lista farka lista, de eggyel rövidebb, ezért a rekurzió mindig visszavezet az üres listára
+; ha rekurzív függvényt irok akkor mindig kell egy bázisfeltétel
+; a bázisfeltétel az ami megállítja a rekurziót
+; a listafeldolgozás esetén a bázisfeltétel: a paraméterként kapott lista üres-e
+
+(define (length igen)
+    (cond
+        ;bázisfeltétel
+        [(empty? igen) 0]
+        ;rekurzív ág: szétszedem fejre és farokra és meghívom önmagam a farokra
+        [else
+            (define fej (first igen))
+            (define farok (rest igen))
+            (define farok-ertek (length farok))
+            ; a következő lépés a visszatérési érték kitalálása, amiben lehet fej illetve farok-érték, de erre nincs recept, ezt egy példán keresztül kell kitalálni
+            ; (length (5 4 2)) = 3 = (+ 1 farok-ertek)
+            ; (length (4 2))  = 2 
+            (+ 1 farok-ertek)]))
+(writeln (length '(5 4 2)))
+(define (sum asztal)
+    (cond
+        [(empty? asztal) 0]
+        [else
+            (define fej (first asztal))
+            (define farok (rest asztal))
+            (define farok-ertek (sum farok)) ; (sum (list 5 4 2)) = 11 -- (sum (list 4 2)) 5+6 = (+ fej farok-ertek)
+            (+ fej farok-ertek)]))
+(writeln (sum (list 4 2)))
+
+;prod: a lista elemeinek szorzata
+(define (prod lista1)
+    (cond
+        [(empty? lista1) 1]
+        [else
+            (define fej (first lista1))
+            (define farok (rest lista1))
+            (define farok-ertek (prod farok)) ; 
+            (* fej farok-ertek)]))
+(writeln (prod '(3 2 3)))
+
+; max lst: az lst-ben lévő legnagyobb elemet adja vissza, üres listának nincs legnagyobb eleme.
+; üres lista esetén adja vissza hogy not a number
+; egy elemű lista esetén, pl: (list 5), a legnagyobb elem az 5
+; tipp: legyen 3 ág
+
+(define (max2 lst)
+    (cond
+        [(empty? lst) +nan.0]
+        [(= 1 (length lst)) (first lst)]
+        [else 
+            (define fej (first lst))
+            (define farok (rest lst))
+            (define farok-ertek (max2 farok))
+            ; példa1
+            ; ( max (list 1 2 6) = 6 (if (> farok-ertek fej) farok-ertek fej)
+            ; (max (list 2 6) = 6
+            ; példa 2:
+            ; (max (list 6 1 2) = 6
+            (if (> farok-ertek fej) farok-ertek fej)]))
+(writeln (max2 '(5 2 1)))
+
+
+
+(define (min2 lst)
+    (cond
+        [(empty? lst) +nan.0]
+        [(= 1 (length lst)) (first lst)]
+        [else
+            (define fej (first lst))
+            (define farok (rest lst))
+            (define farok-ertek (min2 farok))
+            (if (< fej farok-ertek) fej farok-ertek)
+        ]
+    )
+)
+(writeln (min2 '(5 9 12 1 2)))
+
+; eleme-e
+;szintaxisa (eleme-e elem halmaz) pl: (eleme-e 5 (list 1 2 3)) = #f
+;szemantika:ha az elem benne van a listában, akkor igaz, egyébként hamis
+; (eleme-e x empty)
+; pattern matching : magyarul mintaillesztés
+; nagyon erős programozói eszköz
+; az eset szétválogatást segíti (case distinction) -- kurvajó dolog
+; OOP-ben csak részlegesen támogatott, funkcionális oldalon nagyon támogatott
+; minden normális nyelvben így kell megírni a length-et: length([]) = 0, length(fej::farok) = 1 + length(farok)
+
+(define (length-v2 lst)
+    (match lst
+        [(list ) 0]
+        [(cons fej farok)
+            (define farok-ertek (length-v2 farok))
+            (+ 1 farok-ertek)]))
+(writeln (length-v2 (list 1 5 6)))
+
+
+;sum cond helyett matchel
+(define (sum-v2 lst)
+    (match lst
+        [(list ) 0]
+        [(cons fej farok)
+            (define farok-ertek (sum-v2 farok))
+            (+ fej farok-ertek)]))
+            
+(writeln (sum-v2 '(1 4 5)))
+
+;joel spolsky painless functional specification cikkről 1oldal
+;akkumulátor!
+
+
