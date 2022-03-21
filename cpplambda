@@ -1,0 +1,19 @@
+#include <vector>
+#include <iostream>
+#include <algorithm>
+
+void print_modulo(const std::vector<int>& v, std::ostream& os, int m)
+{
+	std::for_each(begin(v), end(v),
+		[&os, m](int x) { if (x & m == 0) os << x << '\n'; }
+		//[&](int x) { if (x & m == 0) os << x << '\n'; }
+	);
+}
+int main()
+{
+	std::vector<int> numbers {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+	int check = 3;
+	print_modulo(numbers,std::cout,check);
+	
+	return 0;
+}
