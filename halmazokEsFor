@@ -1,0 +1,89 @@
+(writeln (member 5 (list 1 2 8 1)))
+
+
+;eleme két param, pl: (eleme 5 (list 5 3 1))
+;általánosan (eleme x lista)
+;megnézi hogy x eleme-e a listának, ehhez rekurzívan feldolgozza a listát
+;ha a lista első eleme x akkor igaz, egyébként rekurzív hívás a farokra
+
+(define (eleme a B)
+    (match B
+    [(list ) #f]
+    [(cons fej farok)
+        (if (= a fej) #t
+            (eleme a farok))]))
+
+                ;cons szintaxisa: (cons fej farok)
+                
+(writeln (eleme 5 (list 1 2 5 8 1)))
+
+; minden halmazműveletet az eleme-e fgre vezetünk vissza
+; a részhalmaza (subset) Bnek ha A minden eleme benne van B-ben, azaz A feje benne van B-ben és a maradék is.
+
+(define (reszhalmaza A B)
+    (match A
+    [(list ) #t]
+    [(cons fej farok) (if (eleme fej B) (reszhalmaza farok B) #f)]))
+    
+(define (setequ A B)
+    (and (reszhalmaza A B) (reszhalmaza B A)))
+
+
+;powerset A egy olyan halmazt ad vissza amiben A összes részhalmaza benne van    
+;union helyett elég most az append
+;meghívom önmagamat a farokra, amit visszaad az az egyik fele, a másik fele amit visszaad annak elejére beírom a fejet
+
+(define (beszurfej a B)
+    (match B
+    [(list X) (list (cons a X))]
+    [(cons fej farok) (cons (cons a fej) (beszurfej a farok))]))
+
+;újfej = 5
+;lista = ( (1) (1 2) (1 2 3) )
+;kimenet = ( (5 1) (5 1 2) (5 1 2 3) )
+(define (beszurfejv2 a B)
+    (for/list ([i B])
+        (cons a i)))
+
+
+(define (powerset A)
+    (match A
+    [(list ) (list (list ))]
+    [(cons fej farok)
+        (define powerfel (powerset farok))
+        (define powerfel2 (beszurfejv2 fej powerfel))
+        (append powerfel powerfel2)]))
+
+(writeln (reszhalmaza (list 1 2 3) (list 1 2 3 4 5)))
+(writeln (setequ (list 3 2 1) (list 1 2 3)))
+(writeln (powerset (list 3 2 1 5 )))
+
+(for ([i (list 1 2 3)])
+    (display i))
+    
+(for ([i "hello"])
+    (displayln i))
+
+(define mylist1 (for/list ([i 100]#:unless(= i 0)) (/ 1 i)))
+;a for után két dolgot lehet irni: when, unless
+(writeln mylist1)
+
+(writeln (beszurfejv2 5 (list (list 1 3 6) (list 1 3 8) (list 3 9 2))))
+
+; unió A B = {x | x eleme A vagy x eleme B}
+; elég az egyik listán végigmenni rekurzívan, ha A üres akkor B-t kell visszaadni
+; ha nem üres akkor szétszedem fejre és farokra, ha A feje benne van B-ben akkor eldobható, egyébként megtartandó
+; eldobandó azt jelenti hogy csak a rekurzív hívást adom vissza
+(define (unio A B)
+    (match A
+    [(list ) B]
+    [(cons fej farok) (if (eleme fej B) (unio farok B) (cons fej (unio farok B)))]))
+    
+(writeln (unio (list 1 2 3) (list 9 8 2)))
+
+(define (intersect A B)
+    (match A
+    [(list ) (list )]
+    [(cons fej farok) (if (eleme fej B) (cons fej (intersect farok B)) (intersect farok B))]))
+
+(writeln (intersect (list 1 2 3) (list 2 3)))
