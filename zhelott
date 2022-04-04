@@ -1,0 +1,69 @@
+;rekurzio vs ciklus
+;a kettő ugyanolyan erős, amit meg lehet csinálni rekurzióva azt meg lehet ciklussal és fordítva
+; de a rekurzió magasabb absztrakciós szinten áll ezért gyakran könnyebb megérteni
+; de a ciklus nem használ vermet, nem kell vezérlést átadni, ezért gyorsabb
+; van egy olyan fajta rekurzió, amiből nagyon könnyű ciklust fordítani: farok rekurzió
+; farok rekurzióról akkor beszélünk : ha az utolsó hívás a rekurzív hívás
+; def(farok reku): azt mondjuk, hogy az f fg. farok reku fg. akkor és csak akkor ha az f törzsében a rekurzív hívás az utolsó
+; ilyenkor az interpreter / fordító ciklust fordít a függvényből, tehát gyors lesz, nem fogunk out of stack hibaüzenetet kapunk.
+; f(x) = if (x==0) 1 else f(x-1) + g(x) -- ez nem farok rekurzív
+; f(x) = if (x==0) 1 else g(x) + f(x-1) -- ez farok rekurzív
+; általában ahhoz hogy farok rekurziót tudjunk írni kell akkumulátor
+; az akkumulátorban gyűjtöm a részeredményeket, ha nem reku ágon a végeredmény az az akkuban van, az akku az egy plusz paraméter
+; az akku kezdő értéke az az amit a sima reku függvény a nem reku ágon visszaad
+(define (sum lst)
+    (match lst
+    [(list ) 0]
+    [(cons fej farok) (+ fej (sum farok))]))
+(writeln (sum (list 2 3 5)))
+
+(define (sum2 lst) (fsum 0 lst))
+(define (fsum akku lst)
+    (match lst
+    [(list ) akku]
+    [(cons fej farok) (define akku2 (+ akku fej)) (fsum akku2 farok)]))
+(writeln (sum2 (list 5 2 5)))
+
+;append: két listát összefűz
+;(myappend (list 1 2 3) (list 2 4 5)) - (1 2 3 2 4 5)
+
+(define (myappend A B)
+    (match A
+    [(list ) B]
+    [(cons fejA farokA) (cons fejA (myappend farokA B))]))
+    
+(writeln (myappend (list 1 2 3) (list 3 4 5)))
+
+(define (myappend2 A B) (fappend B A B))
+(define (fappend akku A B)
+    (match A
+    [(list ) akku]
+    [(cons fejA farokA) (define akku2 (cons fejA akku)) (fappend akku2 farokA B)]))
+(writeln (myappend2 (list 1 2) (list 1 2 3)))
+
+(define (subset A B)
+    (match A
+    [(list ) #t]
+    [(cons fej farok) (if (member fej B) (subset farok B) #f)]))
+(writeln (subset (list 1 2 3) (list 1 2 3 4 5)))
+
+(define (subset2 A B) (fsubset #t A B))
+(define (fsubset akku A B)
+    (match A
+    [(list ) #t]
+    [(cons fejA farokA) (define akku2 (if (member fejA B) akku #f)) (fsubset akku2 farokA B)]))
+(writeln (subset2 (list 1 2) (list 1 2 3)))
+
+; (setminus (1 2 3) ( 3 5)) = (1 2)
+(define (setminus A B)
+    (match A
+    [(list ) (list )]
+    [(cons fejA farokA) (if (member fejA B) (setminus farokA B) (cons fejA (setminus farokA B)))]))
+(writeln (setminus (list 1 2 3 6) (list 2 4 5)))
+
+(define (setminus2 A B) (fminus A A B))
+(define (fminus akku A B)
+    (match A
+    [(list ) akku]
+    [(cons fejA farokA) (define akku2 (if (member fejA B) akku (cons fejA akku))) (fminus akku2 farokA B)]))
+(writeln (setminus2 (list 1 2 6 8 9) (list 2 4 5 6 7)))
